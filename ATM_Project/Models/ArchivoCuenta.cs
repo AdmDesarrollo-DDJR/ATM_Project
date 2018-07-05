@@ -50,14 +50,14 @@ namespace ATM_Project.Models
             {
                 if (result!=null)
                 {
-                    return result["NumCuenta"].Value<string>();
+                    result["NumCuenta"].Value<string>();
                 }
                 else
                 {
                     result = cuenta["NumCuenta"].Value<string>() == PAN ? cuenta : null;
                 }
             }
-            return "";
+            return result!=null? result["NumCuenta"].Value<string>(): "";
         }
 
         public string GetPIN(string PAN)
@@ -75,7 +75,7 @@ namespace ATM_Project.Models
                     result = cuenta["NumCuenta"].Value<string>() == PAN ? cuenta : null;
                 }
             }
-            return "";
+            return result != null ? result["NumCuenta"].Value<string>(): "";
         }
 
         public decimal RestarBalance(string PAN,decimal monto)

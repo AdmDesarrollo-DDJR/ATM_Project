@@ -120,11 +120,13 @@ namespace ATM_Project
             Console.Clear();
             try
             {
+              
                 Console.WriteLine("Enter amount.\n Withdrawls must be multiples of $10");
                 decimal Monto = decimal.Parse(Console.ReadLine());
                 if (Atm.GetBalance() < Monto)
                 {
-                    Console.WriteLine("Insufficient funds!\nPlease enter a new amount");
+
+                        Console.WriteLine("Insufficient funds!\nPlease enter a new amount");
                 }
                 else
                 {
@@ -136,6 +138,7 @@ namespace ATM_Project
                     {
                         Atm.Retirar(Monto);
                         Console.WriteLine("Your balance is being updated. Please take cash from dispenser");
+                        Console.WriteLine("Your new balance is being printed.Another transaction?");
                         var response = Console.ReadLine();
                         if (response == "Y")
                             SeleccionarOpcion();
