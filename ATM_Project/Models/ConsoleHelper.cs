@@ -10,8 +10,8 @@ namespace ATM_Project.Models
     {
         public static int MultipleChoice(bool canCancel, params string[] options)
         {
-            const int startX = 5;
-            const int startY = 0;
+            const int startX = 1;
+            const int startY = 1;
             const int optionsPerLine = 1;
             const int spacingPerLine = 14;
 
@@ -24,7 +24,7 @@ namespace ATM_Project.Models
             do
             {
                 Console.Clear();
-
+                Console.WriteLine("Select transaction:");
                 for (int i = 0; i < options.Length; i++)
                 {
                     Console.SetCursorPosition(startX + (i % optionsPerLine) * spacingPerLine, startY + i / optionsPerLine);

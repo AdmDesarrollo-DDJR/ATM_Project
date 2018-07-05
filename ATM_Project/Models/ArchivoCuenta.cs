@@ -24,80 +24,61 @@ namespace ATM_Project.Models
             this.Ruta = ruta;
         }
 
-        public decimal GetBalance(string PAN)
-        {
-            JArray cuentas = (JArray)JCuentas["Cuentas"];
-            JToken result = null;
-            foreach (var cuenta in cuentas)
-            {
-                if (result != null)
-                {
-                    return result["Informacion"]["Balance"].Value<decimal>();
-                }
-                else
-                {
-                    result = cuenta["NumCuenta"].Value<string>() == PAN ? cuenta : null;
-                }
-            }
-            return -1;
-        }
-
         public string GetPAN(string PAN)
         {
             JArray cuentas = (JArray)JCuentas["Cuentas"];
-            JToken result = null;
             foreach (var cuenta in cuentas)
             {
-                if (result!=null)
+                if (cuenta["NumCuenta"].Value<string>() == PAN)
                 {
-                    result["NumCuenta"].Value<string>();
-                }
-                else
-                {
-                    result = cuenta["NumCuenta"].Value<string>() == PAN ? cuenta : null;
+                    return PAN;
                 }
             }
-            return result!=null? result["NumCuenta"].Value<string>(): "";
+            return "";
         }
 
         public string GetPIN(string PAN)
         {
             JArray cuentas = (JArray)JCuentas["Cuentas"];
-            JToken result = null;
             foreach (var cuenta in cuentas)
             {
-                if (result != null)
+                if (cuenta["NumCuenta"].Value<string>() == PAN)
                 {
-                    return result["Informacion"]["PIN"].Value<string>();
-                }
-                else
-                {
-                    result = cuenta["NumCuenta"].Value<string>() == PAN ? cuenta : null;
+                    return cuenta["Informacion"]["PIN"].Value<string>();
                 }
             }
-            return result != null ? result["NumCuenta"].Value<string>(): "";
+            return "";
+        }
+
+        public decimal GetBalance(string PAN)
+        {
+            JArray cuentas = (JArray)JCuentas["Cuentas"];
+            foreach (var cuenta in cuentas)
+            {
+                if (cuenta["NumCuenta"].Value<string>() == PAN)
+                {
+                    return cuenta["Informacion"]["Balance"].Value<decimal>();
+                }
+            }
+            return -1;
         }
 
         public decimal RestarBalance(string PAN,decimal monto)
         {
-            var index = -1;
+            var index = 0;
             decimal Balance = -1;
             JArray cuentas = (JArray)JCuentas["Cuentas"];
             JToken result = null;
             foreach (var cuenta in cuentas)
             {
-                if (result != null)
+                if (cuenta["NumCuenta"].Value<string>() == PAN)
                 {
-                    Balance = result["Informacion"]["Balance"].Value<decimal>() - monto;
-                    result["Informacion"]["Balance"] = Balance;
+                    Balance = cuenta["Informacion"]["Balance"].Value<decimal>() - monto;
+                    cuenta["Informacion"]["Balance"] = Balance;
+                    result = cuenta;
                     break;
                 }
-                else
-                {
-                    result = cuenta["NumCuenta"].Value<string>() == PAN ? cuenta : null;
-                    index++;
-                }
-
+                index++;
             }
             cuentas[index] = result;
             using (StreamWriter file = File.CreateText(this.Ruta))
@@ -110,26 +91,22 @@ namespace ATM_Project.Models
 
         public decimal SumarBalance(string PAN,decimal monto)
         {
-            var index = -1;
+            var index = 0;
             decimal Balance=-1;
             JArray cuentas = (JArray)JCuentas["Cuentas"];
             JToken result = null;
             foreach (var cuenta in cuentas)
             {
-                if (result != null)
+                if (cuenta["NumCuenta"].Value<string>() == PAN)
                 {
-                    Balance = result["Informacion"]["Balance"].Value<decimal>() + monto;
-                    result["Informacion"]["Balance"] = Balance;
+                    Balance = cuenta["Informacion"]["Balance"].Value<decimal>() + monto;
+                    cuenta["Informacion"]["Balance"] = Balance;
+                    result = cuenta;
                     break;
                 }
-                else
-                {
-                    result = cuenta["NumCuenta"].Value<string>() == PAN ? cuenta : null;
-                    index++;
-                }
-               
+                index++;
             }
-            cuentas[index]=result;
+            cuentas[index] = result;
             JCuentas["Cuentas"] = cuentas;
             using (StreamWriter file = File.CreateText(this.Ruta))
             using (JsonTextWriter writer = new JsonTextWriter(file))

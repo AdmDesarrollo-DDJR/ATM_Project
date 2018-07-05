@@ -64,7 +64,7 @@ namespace ATM_Project
 
         private static void SeleccionarOpcion()
         {
-            Console.WriteLine("Select transaction:");
+          
             int selectedOption = ConsoleHelper.MultipleChoice(true, "Balance>", "Deposit>", "Withdrawal>");
             switch (selectedOption)
             {
@@ -78,43 +78,33 @@ namespace ATM_Project
         private static void Balance()
         {
             Console.Clear();
-            Console.WriteLine("Balance is \n $"+Atm.GetBalance());
-            Console.WriteLine("Your new balance is being printed.Another transaction?");
-            var response = Console.ReadLine();
-            if (response == "Y")
-                SeleccionarOpcion();
-            else
-                Finish();
+            Console.WriteLine("Balance is\n$"+Atm.GetBalance());
+            Console.WriteLine("Your new balance is being printed. Another transaction?");
+            Continue();
+            
         }
         private static void Deposit()
         {
             Console.Clear();
             try
             {
-                Console.Clear();
                 Console.WriteLine("Enter amount.\n Withdrawls must be multiples of $10");
                 decimal Monto = decimal.Parse(Console.ReadLine());
                 Console.WriteLine("Please insert deposit into deposit slot");
+                Atm.Depositar(Monto);
                 Thread.Sleep(5000);
-                Console.WriteLine("Your new balance is being printed.Another transaction?");
-                var response = Console.ReadLine();
-                if (response == "Y")
-                    SeleccionarOpcion();
-                else
-                    Finish();
+                Console.WriteLine("Your new balance is being printed. Another transaction?");
+                Continue();
             }
             catch (Exception ex)
             {
                 Console.Clear();
-                Console.WriteLine("Temporarly unable to process deposits\n Another Transaction?");
-                var response = Console.ReadLine();
-                if (response == "Y")
-                    SeleccionarOpcion();
-                else
-                    Finish();
+                Console.WriteLine("Temporarly unable to process deposits\nAnother Transaction?");
+                Continue();
             }
             Thread.Sleep(3000);
         }
+
         private static void Withdrawal()
         {
             Console.Clear();
@@ -123,47 +113,56 @@ namespace ATM_Project
               
                 Console.WriteLine("Enter amount.\n Withdrawls must be multiples of $10");
                 decimal Monto = decimal.Parse(Console.ReadLine());
-                if (Atm.GetBalance() < Monto)
-                {
 
-                        Console.WriteLine("Insufficient funds!\nPlease enter a new amount");
+                if (Monto % 10 != 0)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Machine can only dispense $10 notes");
+                    Thread.Sleep(2000);
+                    Withdrawal();
                 }
                 else
                 {
-                    if (Monto % 10 != 0)
+                    if (Atm.GetBalance() < Monto)
                     {
-                        Console.WriteLine("Machine can only dispense $10 notes");
+                        Console.Clear();
+                        Console.WriteLine("Insufficient funds!\nPlease enter a new amount");
+                        Thread.Sleep(2000);
+                        Withdrawal();
                     }
                     else
                     {
+                        Console.Clear();
                         Atm.Retirar(Monto);
                         Console.WriteLine("Your balance is being updated. Please take cash from dispenser");
                         Console.WriteLine("Your new balance is being printed.Another transaction?");
-                        var response = Console.ReadLine();
-                        if (response == "Y")
-                            SeleccionarOpcion();
-                        else
-                            Finish();
+                        Continue();
                     }
-                   
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Temporarly unable to process withdrawals\n Another Transaction?");
-                var response = Console.ReadLine();
-                if (response == "Y")
-                    SeleccionarOpcion();
-                else
-                    Finish();
+                Continue();
             }
             Thread.Sleep(3000);
+        }
 
+        private static void Continue()
+        {
+            var response = Console.ReadLine();
+            if (response.ToLower() == "yes")
+                SeleccionarOpcion();
+            else if (response.ToLower() == "no")
+                Finish();
+            else
+                Continue();
         }
 
         private static void Finish()
         {
-            Console.WriteLine("Please take your receipt and ATM card\n Thank you.");
+            Console.Clear();
+            Console.WriteLine("Please take your receipt and ATM card\nThank you.");
             Thread.Sleep(3000);
         }
     }
