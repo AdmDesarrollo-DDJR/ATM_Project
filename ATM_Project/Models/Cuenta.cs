@@ -10,13 +10,15 @@ namespace ATM_Project.Models
     {
         private string NombreCliente { get; set; }
         //Personal Account Number
-        private string PAN { get; set; }
+        public string PAN { get; set; }
         //Personal Identification Number
-        private string PIN { get; set; }
+        public string PIN { get; set; }
         private decimal Balance { get; set; }
 
-        public Cuenta(string pan,string pin,string nombreCliente,decimal balance)
+        public Cuenta(string pan,string pin)
         {
+            this.PAN = pan;
+            this.PIN = pin;
         }
 
     }

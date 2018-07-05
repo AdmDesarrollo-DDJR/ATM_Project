@@ -13,14 +13,33 @@ namespace ATM_Project.Models
     public class ArchivoCuenta : IDataSource
     {
         JObject JCuentas;
+        private string Ruta;
         public ArchivoCuenta(string ruta)
         {
-            this.JCuentas=JObject.Load(new JsonTextReader(File.OpenText(ruta)));
+            using (StreamReader file = File.OpenText(ruta))
+            using (JsonTextReader reader = new JsonTextReader(file))
+            {
+                this.JCuentas = (JObject)JToken.ReadFrom(reader);
+            }
+            this.Ruta = ruta;
         }
 
         public decimal GetBalance(string PAN)
         {
-            throw new NotImplementedException();
+            JArray cuentas = (JArray)JCuentas["Cuentas"];
+            JToken result = null;
+            foreach (var cuenta in cuentas)
+            {
+                if (result != null)
+                {
+                    return result["Informacion"]["Balance"].Value<decimal>();
+                }
+                else
+                {
+                    result = cuenta["NumCuenta"].Value<string>() == PAN ? cuenta : null;
+                }
+            }
+            return -1;
         }
 
         public string GetPAN(string PAN)
@@ -59,14 +78,65 @@ namespace ATM_Project.Models
             return "";
         }
 
-        public decimal RestarBalance(string PAN)
+        public decimal RestarBalance(string PAN,decimal monto)
         {
-            throw new NotImplementedException();
+            var index = -1;
+            decimal Balance = -1;
+            JArray cuentas = (JArray)JCuentas["Cuentas"];
+            JToken result = null;
+            foreach (var cuenta in cuentas)
+            {
+                if (result != null)
+                {
+                    Balance = result["Informacion"]["Balance"].Value<decimal>() - monto;
+                    result["Informacion"]["Balance"] = Balance;
+                    break;
+                }
+                else
+                {
+                    result = cuenta["NumCuenta"].Value<string>() == PAN ? cuenta : null;
+                    index++;
+                }
+
+            }
+            cuentas[index] = result;
+            using (StreamWriter file = File.CreateText(this.Ruta))
+            using (JsonTextWriter writer = new JsonTextWriter(file))
+            {
+                JCuentas.WriteTo(writer);
+            }
+            return Balance;
         }
 
-        public decimal SumarBalance(string PAN)
+        public decimal SumarBalance(string PAN,decimal monto)
         {
-            throw new NotImplementedException();
+            var index = -1;
+            decimal Balance=-1;
+            JArray cuentas = (JArray)JCuentas["Cuentas"];
+            JToken result = null;
+            foreach (var cuenta in cuentas)
+            {
+                if (result != null)
+                {
+                    Balance = result["Informacion"]["Balance"].Value<decimal>() + monto;
+                    result["Informacion"]["Balance"] = Balance;
+                    break;
+                }
+                else
+                {
+                    result = cuenta["NumCuenta"].Value<string>() == PAN ? cuenta : null;
+                    index++;
+                }
+               
+            }
+            cuentas[index]=result;
+            JCuentas["Cuentas"] = cuentas;
+            using (StreamWriter file = File.CreateText(this.Ruta))
+            using (JsonTextWriter writer = new JsonTextWriter(file))
+            {
+                JCuentas.WriteTo(writer);
+            }
+            return Balance;
         }
     }
 }
